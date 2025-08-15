@@ -1,3 +1,7 @@
 # 4k 모니터라 글자가 너무 작은경우
 Xft.dpi: 192
 xrdb -merge ~/.Xresources
+
+# 키 입력 속도 변경 적용
+systemctl --user daemon-reload
+systemctl --user enable --now keyboard-rate.service

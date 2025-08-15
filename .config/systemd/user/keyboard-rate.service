@@ -1,0 +1,11 @@
+[Unit]
+Description=Set keyboard repeat rate for X11
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/xset r rate 300 40
+
+[Install]
+WantedBy=default.target
