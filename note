@@ -5,3 +5,9 @@ xrdb -merge ~/.Xresources
 # 키 입력 속도 변경 적용
 systemctl --user daemon-reload
 systemctl --user enable --now keyboard-rate.service
+
+# 라즈베리파이 초기화 스크립트 실행 방법
+./run-remote-rasp-init.sh rasp-private /tmp/rasp-init
+sudo systemctl disable --now systemd-networkd-wait-online.service
+sudo systemctl enable --now NetworkManager-wait-online.service
+reboot 필요
