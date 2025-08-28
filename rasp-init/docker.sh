@@ -15,7 +15,7 @@ fi
 
 # 패키지 업데이트 및 Docker 설치 (iptables-nft 우선 설치)
 pacman -Syu --noconfirm
-pacman -S iptables-nft
+pacman -S --noconfirm iptables-nft
 pacman -S --noconfirm nftables docker
 
 # Docker 서비스 활성화
@@ -38,18 +38,33 @@ else
   echo "ℹ️  TARGET_USER 미지정 또는 root 입니다. docker 그룹 추가를 건너뜁니다. (필요 시: TARGET_USER=username 설정)"
 fi
 
-# 로그 로테이션 설정 (없을 때만 생성)
+# daemon.json 업데이트 (항상 덮어쓰기)
 DAEMON_JSON=/etc/docker/daemon.json
-if [[ ! -f "$DAEMON_JSON" ]]; then
-  mkdir -p /etc/docker
-  tee "$DAEMON_JSON" >/dev/null <<'JSON'
+mkdir -p /etc/docker
+if [[ -f "$DAEMON_JSON" ]]; then
+  cp "$DAEMON_JSON" "${DAEMON_JSON}.$(date +%Y%m%d%H%M%S).bak" || true
+fi
+tee "$DAEMON_JSON" >/dev/null <<'JSON'
 {
   "log-driver": "json-file",
-  "log-opts": { "max-size": "50m", "max-file": "3" }
+  "log-opts": { "max-size": "50m", "max-file": "3" },
+  "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"]
 }
 JSON
-  systemctl restart docker
-fi
+
+# systemd 설정: -H fd:// 제거하고 daemon.json 을 사용하도록 override
+mkdir -p /etc/systemd/system/docker.service.d
+cat >/etc/systemd/system/docker.service.d/override.conf <<'CONF'
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd --containerd=/run/containerd/containerd.sock
+CONF
+
+# socket 활성화 충돌 방지: docker.socket 비활성화
+systemctl disable --now docker.socket 2>/dev/null || true
+
+systemctl daemon-reload
+systemctl restart docker
 
 # 설치 확인
 docker --version
