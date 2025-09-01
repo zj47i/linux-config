@@ -14,3 +14,9 @@ sudo systemctl enable --now NetworkManager-wait-online.service
 reboot 필요
 
 # git-prompt를 설치해야지 쉘에 깃 정보를 표시할 수 있다.
+
+# docker 데이터 위치를 변경하고 싶다면 /etc/docker/daemon.json에서
+{
+  "data-root": "/mnt/docker-data"
+}
+# 이런식으로 설정하면 된다.
