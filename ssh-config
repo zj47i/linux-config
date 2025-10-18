@@ -1,0 +1,20 @@
+Host rasp-private
+    HostName 192.168.0.2
+    User rasp
+    Port 22
+    
+Host rasp-public
+    HostName 192.168.0.3
+    User rasp
+    Port 22
+
+Host rasp-secret
+    HostName 192.168.0.5
+    User rasp
+    Port 22
+
+Host fingerlabs
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/hand-number
+    IdentitiesOnly yes
